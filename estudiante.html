@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Importando Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <title>Gestión de Estudiantes</title>
+</head>
+<body>
+    <header class="bg-primary text-white py-3">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Gestión de Estudiantes</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="curso.html">Cursos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="estudiante.html">Estudiantes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="docente.html">Docentes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="materia.html">Materias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="autoridad.html">Autoridades</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-4">
+        <h1 class="mb-4">Gestión de Estudiantes</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Agregar Estudiante</h2>
+                </div>
+                <div class="card-body">
+                    <form id="estudiante-form">
+                        <div class="mb-3">
+                            <label for="cedula" class="form-label">Cédula</label>
+                            <input type="text" class="form-control" id="cedula" placeholder="Cédula del estudiante" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" placeholder="Nombre del estudiante" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" placeholder="Apellido del estudiante" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" placeholder="Dirección del estudiante">
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="fecha_nacimiento" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="curso" class="form-label">Curso</label>
+                            <select id="curso" class="form-select" required>
+                                <option value="">Seleccione un curso</option>
+                                <!-- Opciones se llenarán con JavaScript -->
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Estudiante</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Lista de Estudiantes</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Cédula</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Dirección</th>
+                                <th>Fecha de Nacimiento</th>
+                                <th>Curso</th>
+                            </tr>
+                        </thead>
+                        <tbody id="estudiantes-table">
+                            <!-- Los datos se insertarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar los datos de los cursos
+        function loadCursos() {
+            fetch('http://localhost:3000/api/cursos')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(cursos => {
+                    const cursoSelect = document.getElementById('curso');
+                    cursoSelect.innerHTML = '<option value="">Seleccione un curso</option>'; // Limpiar y agregar opción por defecto
+
+                    cursos.forEach(curso => {
+                        const option = document.createElement('option');
+                        option.value = curso.id;
+                        option.textContent = curso.nombre;
+                        cursoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching cursos:', error);
+                });
+        }
+
+        // Función para cargar los datos de los estudiantes
+        function loadEstudiantes() {
+            fetch('http://localhost:3000/api/estudiantes')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(estudiantes => {
+                    const tableBody = document.getElementById('estudiantes-table');
+                    tableBody.innerHTML = ''; // Limpiar la tabla antes de insertar nuevos datos
+
+                    estudiantes.forEach(estudiante => {
+                        const row = tableBody.insertRow();
+                        row.insertCell(0).textContent = estudiante.id || 'N/A';
+                        row.insertCell(1).textContent = estudiante.cedula || 'N/A';
+                        row.insertCell(2).textContent = estudiante.nombre || 'N/A';
+                        row.insertCell(3).textContent = estudiante.apellido || 'N/A';
+                        row.insertCell(4).textContent = estudiante.direccion || 'N/A';
+                        row.insertCell(5).textContent = estudiante.fecha_nacimiento || 'N/A';
+                        row.insertCell(6).textContent = estudiante.fkid_curso || 'N/A'; // Mostrar el nombre del curso en lugar del ID
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching estudiantes:', error);
+                });
+        }
+
+        // Función para agregar un nuevo estudiante
+        function addEstudiante(event) {
+            event.preventDefault(); // Prevenir el envío del formulario
+
+            // Obtener los valores de los campos del formulario
+            const cedula = document.getElementById('cedula').value;
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const direccion = document.getElementById('direccion').value;
+            const fecha_nacimiento = document.getElementById('fecha_nacimiento').value;
+            const curso = document.getElementById('curso').value; // Asegúrate de que esto esté enviando el id del curso
+
+            // Verifica que el curso seleccionado no esté vacío
+            if (!curso) {
+                console.error('Debe seleccionar un curso.');
+                return;
+            }
+
+            fetch('http://localhost:3000/api/estudiantes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ cedula, nombre, apellido, direccion, fecha_nacimiento, fkid_curso: curso })
+            })
+            .then(response => response.json())
+            .then(() => {
+                loadEstudiantes();
+                document.getElementById('estudiante-form').reset(); // Limpiar el formulario
+            })
+            .catch(error => {
+                console.error('Error adding estudiante:', error);
+            });
+        }
+
+        // Cargar los cursos y estudiantes cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCursos();
+            loadEstudiantes();
+        });
+
+        // Manejar el envío del formulario
+        document.getElementById('estudiante-form').addEventListener('submit', addEstudiante);
+    </script>
+</body>
+</html>

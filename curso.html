@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Importando Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <title>Gestión de Cursos</title>
+</head>
+<body>
+    <header class="bg-primary text-white py-3">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Gestión de Cursos</a>
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="curso.html">Cursos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="estudiante.html">Estudiantes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="docente.html">Docentes</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="materia.html">Materias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="autoridad.html">Autoridades</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-4">
+        <h1 class="mb-4">Gestión de Cursos</h1>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Agregar Curso</h2>
+                </div>
+                <div class="card-body">
+                    <form id="curso-form" >
+                        <div class="mb-3">
+                            <label for="codigo" class="form-label">Código</label>
+                            <input type="text" class="form-control" id="codigo" placeholder="Código del curso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" placeholder="Nombre del curso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <input type="text" class="form-control" id="descripcion" placeholder="Descripción del curso">
+                        </div>
+                        <div class="mb-3">
+                            <label for="duracion" class="form-label">Duración</label>
+                            <input type="text" class="form-control" id="duracion" placeholder="Duración del curso" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="fecha_inicio" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fecha_fin" class="form-label">Fecha de Fin</label>
+                            <input type="date" class="form-control" id="fecha_fin" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Agregar Curso</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h2>Lista de Cursos</h2>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Descripción</th>
+                                <th>Duración</th>
+                                <th>Fecha de Inicio</th>
+                                <th>Fecha de Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cursos-table">
+                            <!-- Los datos se insertarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar los datos de los cursos
+        function loadCursos() {
+            fetch('http://localhost:3000/api/cursos')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(cursos => {
+                    const tableBody = document.getElementById('cursos-table');
+                    tableBody.innerHTML = ''; // Limpiar la tabla antes de insertar nuevos datos
+
+                    cursos.forEach(curso => {
+                        const row = tableBody.insertRow();
+                        row.insertCell(0).textContent = curso.id || 'N/A';
+                        row.insertCell(1).textContent = curso.codigo || 'N/A';
+                        row.insertCell(2).textContent = curso.nombre || 'N/A';
+                        row.insertCell(3).textContent = curso.descripcion || 'N/A';
+                        row.insertCell(4).textContent = curso.duracion || 'N/A';
+                        row.insertCell(5).textContent = curso.fecha_inicio || 'N/A';
+                        row.insertCell(6).textContent = curso.fecha_fin || 'N/A';
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching cursos:', error);
+                });
+        }
+
+        // Función para agregar un nuevo curso
+        function addCurso(event) {
+            event.preventDefault(); // Prevenir el envío del formulario
+
+            // Obtener los valores de los campos del formulario
+            const codigo = document.getElementById('codigo').value;
+            const nombre = document.getElementById('nombre').value;
+            const descripcion = document.getElementById('descripcion').value;
+            const duracion = parseInt(document.getElementById('duracion').value, 10);
+            const fecha_inicio = document.getElementById('fecha_inicio').value;
+            const fecha_fin = document.getElementById('fecha_fin').value;
+
+            fetch('http://localhost:3000/api/cursos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ codigo, nombre, descripcion, duracion, fecha_inicio, fecha_fin })
+            })
+            .then(response => response.json())
+            .then(curso=>{
+                loadCursos();
+            })
+            .then(() => {
+                document.getElementById('curso-form').reset(); // Limpiar el formulario
+            })
+            .catch(error => {
+                console.error('Error adding curso:', error);
+            });
+        }
+
+        // Cargar los cursos cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', loadCursos);
+        loadCursos();
+        // Manejar el envío del formulario
+        document.getElementById('curso-form').addEventListener('submit', addCurso,loadCursos());
+    </script>
+</body>
+</html>
