@@ -107,7 +107,7 @@
     <script>
         // Función para cargar los datos de los cursos
         function loadCursos() {
-            fetch('http://localhost:3000/api/cursos')
+            fetch('http://18.216.32.213:3000/api/cursos')
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
@@ -146,7 +146,7 @@
             const fecha_inicio = document.getElementById('fecha_inicio').value;
             const fecha_fin = document.getElementById('fecha_fin').value;
 
-            fetch('http://localhost:3000/api/cursos', {
+            fetch('http://18.216.32.213:3000/api/cursos', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
